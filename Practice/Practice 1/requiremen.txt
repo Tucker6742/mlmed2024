@@ -1,5 +1,0 @@
-polars
-numpy
-matplotlib
-varname
-
