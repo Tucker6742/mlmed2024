@@ -1,5 +1,5 @@
-polars == 0.20.10
-numpy == 1.26.2
-matplotlit == 3.8.2
-varname == 0.13.0
+polars
+numpy
+matplotlib
+varname
 
