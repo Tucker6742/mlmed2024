@@ -13,3 +13,7 @@ Student Info
 * Name: *Nguyen Phan Gia Bao*
 * ID: *BI12-048*
 * Group ID: *TBA*
+
+# Usage
+
+Open a practice folder in `Practice` folder for a specific Practice works. Eg: `Practice/Practice 1`

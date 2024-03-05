@@ -219,8 +219,6 @@ class Dataset_config:
 # %%
 DATA_SIGNAL = Dataset_config([data_train, data_val, data_test], CONFIG)
 
-# %%
-DATA_SIGNAL.train_dataset.__len__(), DATA_SIGNAL.val_dataset.__len__(), DATA_SIGNAL.test_dataset.__len__()
 
 # %% [markdown]
 # # $\text{Make model}$
