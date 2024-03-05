@@ -1,7 +1,7 @@
 # Usage
 
 1. Run `pip install -r requirements.txt`
-2. Run `Data analysis.py` or `Running model.py` for corresponding task in src folder
+2. Run `Data analysis.py` or `Running model.py` for corresponding task in `src` folder
 
 
 
