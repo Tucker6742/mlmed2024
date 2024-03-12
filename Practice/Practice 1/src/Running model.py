@@ -290,6 +290,7 @@ class Lightning_Wrapper(ptl.LightningModule):
             self.loss_fn = nn.CrossEntropyLoss(torch.tensor(config.weight).float())
         else:
             self.loss_fn = nn.CrossEntropyLoss()
+        self.save_hyperparameters("learning_rate")
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)

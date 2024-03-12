@@ -1,60 +1,285 @@
-\documentclass[conference]{IEEEtran}
+\documentclass[14pt]{extreport}
+
+\usepackage{amssymb, amsfonts, amsmath}
+\usepackage{bbm}
+\usepackage{multicol}
+\usepackage[utf8]{vietnam}
+\usepackage[main=english, vietnamese]{babel}
+\usepackage{moresize}
+\usepackage[document]{ragged2e}
+\usepackage{changepage}
 \usepackage{graphicx}
-\title{ECG Heartbeat Classification}
+\usepackage{tocloft}
+\usepackage{etoolbox}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage[export]{adjustbox}
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage[
+            left=1in,
+            right=1in,
+            top=1in,
+            bottom=1in,
+            ]{geometry}
+\usepackage{subcaption}
+\usepackage{setspace}
+
+% Font size edit
+\newcommand{\fontset}[3]{\fontsize{#1}{#2}\selectfont {#3}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+
+% TOC setting
+\renewcommand\cftchapfont{\large\bfseries}
+\renewcommand\cftsecfont{\large}
+\renewcommand\cftchappagefont{\large\bfseries}
+\renewcommand\cftsecpagefont{\large}
+\renewcommand\cftchapafterpnum{\par\addvspace{10pt}}
+\renewcommand\cftsecafterpnum{\par\addvspace{5pt}}
+\renewcommand\cftsubsecafterpnum{\par\addvspace{5pt}}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+% --------------------------------------------------------
+
+% Chapter setting
+\titleformat{\chapter}{\Large\bfseries}{\thechapter.}{10pt}{\Large\bf}
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{\par}{}{}
+\makeatother
+
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+\titlespacing*{\chapter}{0pt}{0pt}{0pt}
+
+% --------------------------------------------------------
+
+% Caption setting
+\captionsetup[table]{hypcap=false}
+
+% --------------------------------------------------------
+
+% Table setting
+\renewcommand\tabularxcolumn[1]{m{#1}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% --------------------------------------------------------
+% Bib setting
+% \renewcommand{\bibname}{}
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+
 \begin{document}
-\maketitle
 
-\section{Introduction}
+\begin{titlepage}
+    \begin{center}
+        \begin{adjustwidth}{-100pt}{-100pt}
+            \centering
+            {\fontsize{20}{15}\selectfont UNIVERSITY OF SCIENCE AND TECHNOLOGY OF HANOI}
+            \vspace{1cm}
+            \begin{figure}[ht]
+                \includegraphics[max width=\linewidth]{../../../Figure/Logopad.png}
+            \end{figure}
+            \vspace{2cm}
 
-Heart
+        \end{adjustwidth}
+        \textbf{\LARGE ECG Heartbeat Classification using Deep Learning}
+        \newline
+        \vspace{4cm}
+        \textbf{\Large Nguyễn Phan Gia Bảo}
+        \newline
+        % \vspace{1cm}
+        \textbf{\Large BI12-048}
+        \date{}
+    \end{center}
+\end{titlepage}
 
-Heartbeat: what why
+% --------------------------------------------------------
 
-Heartbeat in clinical diagnosis: what why
-
-ML: what why 
-
-ML in heartbeat Classification: what why
-
-What other people do in ML for heartbeat Classification: survey
-
-State problem
-
-\section{Background}
-
-ECG 
-
-CNN 
-
-\section{Method}
-
-CNN architecture
-
-\section{Evaluation}
-
-Dataset
-
-Metric
-
-Result
-
-Discussion
-
-\section{Conclusion}
-
-What you did, what you did not do, what's wrong
-
-What should be done in the future
+% TOC
+\begingroup\singlespacing
+\tableofcontents
+\endgroup
+\clearpage
 
 
+\chapter{Introduction}
+
+Heartbeat classification is crucial for detecting and diagnosing various cardiac conditions, such as arrhythmias, myocardial infarction, and heart failure. Traditional methods for heartbeat classification rely on visual inspection of the ECG signal by trained medical professionals, which is time-consuming, subjective, and prone to errors. Therefore, automated heartbeat classification algorithms have been developed to improve the accuracy, efficiency, and consistency of ECG analysis.
+
+In recent years, machine learning techniques, particularly deep learning algorithms, have shown promising results in ECG heartbeat classification. These algorithms can learn complex patterns and features from large datasets of ECG signals, enabling accurate and efficient heartbeat classification. However, there are still challenges in ECG heartbeat classification, such as the variability of ECG signals across patients, the presence of noise and artifacts, and the imbalance of classes in the dataset.
+
+To address these challenges, I propose a deep learning-based approach for ECG heartbeat classification. Our approach uses a Convolutional Neural Network (CNN) to extract features from the ECG signal, I aim to improve the accuracy and robustness of ECG heartbeat classification using this method.
+
+\chapter{Background}
+
+\section{ECG (Electrocardiogram)}
+
+The electrocardiogram (ECG) is a widely used non-invasive test for diagnosing and monitoring cardiovascular diseases. The ECG signal represents the electrical activity of the heart and provides valuable information about its condition, such as heart rate, rhythm, and conduction abnormalities. Heartbeat classification is an essential step in the analysis of ECG signals, as it involves identifying and categorizing the different types of heartbeats present in the signal.
+
+ECG signals are typically recorded using electrodes placed on the patient's skin, and are represented as a series of waves and intervals that correspond to different parts of the cardiac cycle. Each ECG waveform has a characteristic shape, amplitude, and duration, and abnormalities in these features can indicate the presence of a heart condition.
+
+\section{CNN architecture}
+
+Convolutional Neural Networks (CNNs) are a type of deep learning algorithm that has been widely used in image and signal processing tasks. CNNs are particularly well-suited for extracting features from complex and high-dimensional data, such as ECG signals. The architecture of a CNN consists of multiple layers, including convolutional, pooling, and fully connected layers, which enable the network to learn hierarchical representations of the input data.
+
+\chapter{Dataset}
+\section{Data overview}
+The dataset used in this study is composed of two collections of heartbeat signals derived from two famous datasets in heartbeat classification, the MIT-BIH Arrhythmia Dataset
+
+\begin{enumerate}
+    \item[\textbullet] Number of Samples: 109446
+    \item[\textbullet] Number of Categories: 5
+    \item[\textbullet] Sampling Frequency: 125Hz
+    \item[\textbullet] Data Source: Physionet's MIT-BIH Arrhythmia Dataset {"cite"}
+    \item[\textbullet] Classes: ['N': 0, 'S': 1, 'V': 2, 'F': 3, 'Q': 4]
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering,margin=2cm}
+    \includegraphics[height = 0.95\textheight, keepaspectratio]{../Figure/Signal Classes data_train.png}
+    \caption{Sample ECG signal from the MIT-BIH Arrhythmia Dataset of all classes in train dataset}
+    \label{ECG sample train}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering,margin=2cm}
+    \includegraphics[width = 1\linewidth, keepaspectratio]{../Figure/Signal Classes data_train Pie Chart.png}
+    \caption{ECG class percentage in train dataset}
+    \label{ECG train percentage}
+\end{figure}
+
+As can be seen in the two figure here, the dataset is imbalanced, with the majority of samples belonging to the 'N' class, which represents normal heartbeats. This imbalance can affect the performance of the classification algorithm, as the network may be biased towards the majority class and have difficulty learning the features of the minority classes.
+
+Even though the signal of class "F" and "Q" has a low amount compare to the "N" class signal, there is a clear signal shape in all signal of those class  which could result in better classification performance despite the low amount of data.
+
+\section{Data processing}
+Due to the imbalance data of class "N" in the dataset, I under sample the "N" class to balance the dataset. The under sampling process is done by randomly selecting signal of class "N" so that the total number of signal is the average of all the other class. The under sampling process is done to avoid the model to be biased toward the majority class and have difficulty learning the features of the minority classes.
+
+\chapter{Method}
+I applied the same neural network\cite{Model architecture} as the author of the original paper use to easily compare the result after training.
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering,margin=2cm}
+    \includegraphics{../Figure/model.png}
+    \caption{Model Architecture}
+    \label{Model Architecture}
+\end{figure}
+
+\chapter{Evaluation}
+To evaluate the performance of the model, I used the following metrics:
+\begin{enumerate}
+    \item[\textbullet] Accuracy: the proportion of correctly classified samples to the total number of samples.
+
+          \[Accuracy = \frac{TP + TN}{TP + TN + FP + FN}\]
+
+    \item[\textbullet] Precision: the proportion of true positive samples to the total number of samples predicted as positive.
+
+          \[Precision = \frac{TP}{TP + FP}\]
+
+    \item[\textbullet] Recall: the proportion of true positive samples to the total number of positive samples.
+
+          \[Recall = \frac{TP}{TP + FN}\]
+
+    \item[\textbullet] F1-score: the harmonic mean of precision and recall, which provides a balance between the two metrics.
+
+          \[F1-score = 2 \times \frac{Precision \times Recall}{Precision + Recall}\]
+
+    \item[\textbullet] Confusion matrix: a table that shows the number of true positive, true negative, false positive, and false negative samples for each class.
+
+    \item[\textbullet] ROC curve: a graphical representation of the true positive rate (sensitivity) versus the false positive rate (1-specificity) for different threshold values.
+
+    \item[\textbullet] Precision-recall curve: a graphical representation of precision versus recall for different threshold values.
+\end{enumerate}
+
+\begin{center}
+    \renewcommand{\arraystretch}{2}
+    \begin{tabularx}{\textwidth}{
+        |>{\hsize=0.6\hsize\linewidth=\hsize}C   %Class
+        |>{\hsize=1.3\hsize\linewidth=\hsize}C  %Accuracy
+        |>{\hsize=1.3\hsize\linewidth=\hsize}C  %Precision
+        |>{\hsize=\hsize\linewidth=\hsize}C  %Recall
+        |>{\hsize=1.2\hsize\linewidth=\hsize}C  %F1-score
+        |>{\hsize=0.8\hsize\linewidth=\hsize}C  %ROC AUC
+        |>{\hsize=0.8\hsize\linewidth=\hsize}C  %PR AUC
+        |
+        }
+        \hline
+        Class & Accuracy $\uparrow$ & Precision $\uparrow$ & Recall $\uparrow$ & F1-score $\uparrow$ & ROC AUC $\uparrow$ & PR AUC $\uparrow$ \\
+        \hline
+        N     & 0.8594              & 0.9312               & 0.8594            & 0.8939              & 0.991              & 0.967             \\
+        \hline
+        S     & 0.9336              & 0.8669               & 0.9336            & 0.8990              & 0.995              & 0.971             \\
+        \hline
+        V     & 0.9536              & 0.9790               & 0.9536            & 0.9661              & 0.997              & 0.994             \\
+        \hline
+        F     & 0.9565              & 0.6226               & 0.9565            & 0.7543              & 0.991              & 0.934             \\
+        \hline
+        Q     & \textbf{0.9855}     & \textbf{0.9927}      & \textbf{0.9855}   & \textbf{0.9891}     & \textbf{0.999}     & \textbf{0.999}    \\
+        \hline
+    \end{tabularx}
+    \captionof{table}{Model performance metrics}
+    \label{Model performance metrics}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering,margin=2cm}
+    \includegraphics[width = 1\linewidth, keepaspectratio]{../Figure/Confu.png}
+    \caption{Confusion matrix}
+    \label{Confusion matrix}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering,margin=2cm}
+    \includegraphics[width = 1\linewidth, keepaspectratio]{../Figure/ROC.png}
+    \caption{ROC curve}
+    \label{ROC curve}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering,margin=2cm}
+    \includegraphics[width = 1\linewidth, keepaspectratio]{../Figure/PRC.png}
+    \caption{Precision-recall curve}
+    \label{Precision-recall curve}
+\end{figure}
 
 
 
+\chapter{Conclusion}
 
+In this study, I proposed a deep learning-based approach for ECG heartbeat classification using a Convolutional Neural Network (CNN). The model achieved high accuracy, precision, recall, and F1-score for all classes, indicating that it is effective in classifying ECG heartbeats. The model also performed well in terms of the area under the ROC curve and the area under the precision-recall curve, which demonstrates its ability to discriminate between different classes and to balance precision and recall.
 
+The results of this study suggest that deep learning algorithms, particularly CNNs, can be effective in ECG heartbeat classification. Future work could involve further optimizing the model architecture and hyperparameters, as well as exploring other deep learning algorithms and techniques for ECG analysis.
 
+\clearpage
 
+\chapter{References}
+\begingroup
+\renewcommand{\chapter}[2]{}
+\begin{thebibliography}{}
+    \bibitem{Model architecture}
+    Mohammad Kachuee, Shayan Fazeli, and Majid Sarrafzadeh. "ECG Heartbeat Classification: A Deep Transferable Representation." arXiv preprint arXiv:1805.00794 (2018).
 
-
+\end{thebibliography}
+\endgroup
 
 \end{document}

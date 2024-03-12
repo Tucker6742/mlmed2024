@@ -2,4 +2,13 @@ archive/
 Paper.pdf
 Figure/
 src/Jupyter notebook/lightning_logs/
+**/Report/*.aux
+**/Report/*.fdb_latexmk
+**/Report/*.fls
+**/Report/*.toc
+**/Report/*.out
+*.log
+**/Report/*.gz
+Test/
+Report/ECGReport.pdf
 
