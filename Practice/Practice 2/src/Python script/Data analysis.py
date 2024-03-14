@@ -97,13 +97,14 @@ def formatting_data(
 
     """
     name = data_path.name
+    print(f"Formatting {name} data")
+    annotation_paths = sorted((data_path / "annotations").glob("*.png"))
+    image_paths = sorted((data_path / "images").glob("*.png"))
     data = pl.DataFrame(
         {
-            "image_name": [i.name for i in data_path.glob("*.png")],
-            "image_path": [str(i) for i in data_path.glob("*.png")],
-            "annotation_path": [
-                str(i) for i in (root_dir / "annotations" / name).glob("*.png")
-            ],
+            "image_name": [i.name for i in image_paths],
+            "image_path": [str(i) for i in image_paths],
+            "annotation_path": [str(i) for i in annotation_paths],
         }
     )
 
@@ -141,7 +142,7 @@ def formatting_data(
 
 
 # %%
-def write_an_obb(anno_path: str | Path, root_dir: Path) -> None:
+def write_an_obb(anno_path: str | Path) -> None:
     """
     - Parameters
         - anno_path: Path (path to an annotation image)
@@ -171,7 +172,7 @@ def write_an_obb(anno_path: str | Path, root_dir: Path) -> None:
     x3, y3 = coords[:, np.argmax(coords[1])] / pixel_array.T.shape
     x4, y4 = coords[:, np.argmin(coords[0])] / pixel_array.T.shape
     name = anno_path.name.rsplit("_", 1)[0] + ".txt"
-    with open(root_dir / "labels" / data_class / name, "w") as f:
+    with open(anno_path.parents[1] / "labels" / name, "w") as f:
         f.write(f"0 {x1} {y1} {x2} {y2} {x3} {y3} {x4} {y4}")
 
 
@@ -190,14 +191,13 @@ def write_oob_labels(data: pl.DataFrame, root_dir: Path) -> None:
         - None
     """
     name = argname("data").split("_")[1]
-    print(f"Writing oriented bounding box labels to {root_dir / 'labels' / name} ...")
+    print(f"Writing oriented bounding box labels to {root_dir  / name / 'labels'} ...")
     anno_paths = data["annotation_path"].to_list()
-    root_dir = [root_dir for i in anno_paths]
-    thread_map(write_an_obb, anno_paths, root_dir)
+    thread_map(write_an_obb, anno_paths)
 
 
 # %%
-def plot_sample_data(data: pl.DataFrame, *args, **kwargs) -> None:
+def plot_sample_data(data: pl.DataFrame, name: str, *args, **kwargs) -> None:
     """
     - Parameters:
         - `data`: pl.DataFrame (dataframe containing the image aname, image path, annotation path, and the ellipse parameters, the pixel size and the head circumference)
@@ -209,7 +209,7 @@ def plot_sample_data(data: pl.DataFrame, *args, **kwargs) -> None:
     - Returns:
         None
     """
-    fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+    fig, axes = plt.subplots(2, 2, figsize=(10, 10), layout="constrained")
     axes = axes.flatten()
     data = data.sample(fraction=1, shuffle=True)
     for i, ax in enumerate(axes):
@@ -225,33 +225,35 @@ def plot_sample_data(data: pl.DataFrame, *args, **kwargs) -> None:
         )
         ax.add_patch(ellipse)
         ax.set_title(data["image_name"][i])
+    fig.suptitle(f"Sample images in {name} with their corresponding ellipse annotation")
     plt.show()
 
 
 # %%
 def plot_data(data: pl.DataFrame, *args, **kwargs) -> None:
-    plot_sample_data(data)
+    name = argname("data").split("_")[1]
+    plot_sample_data(data, name)
 
-
-# %% [markdown]
-# # $\text{Reads and Analyze data}$
 
 if __name__ == "__main__":
+    # %% [markdown]
+    # # $\text{Reads and Analyze data}$
+
     # %%
     root_dir = Path("../../data")
 
     # %%
-    data_path_train: pathlib.Path = Path("../../data/images/train")
+    data_path_train: pathlib.Path = Path("../../data/train")
     data_train: pl.DataFrame = formatting_data(data_path_train, root_dir)
     data_train.head()
 
     # %%
-    data_path_val = Path("../../data/images/val")
+    data_path_val = Path("../../data/val")
     data_val: pl.DataFrame = formatting_data(data_path_val, root_dir)
     data_val.head()
 
     # %%
-    data_path_test = Path("../../data/images/test")
+    data_path_test = Path("../../data/test")
     data_test: pl.DataFrame = formatting_data(data_path_test, root_dir)
     data_test.head()
 

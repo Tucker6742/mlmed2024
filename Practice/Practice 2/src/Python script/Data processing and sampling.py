@@ -14,6 +14,7 @@ import numpy.linalg as npla
 from matplotlib.patches import Ellipse
 from tqdm.contrib.concurrent import thread_map
 from shutil import copyfile, rmtree, move
+from directory_tree import display_tree
 
 # %% [markdown]
 # # $\text{Utils functions}$
@@ -58,21 +59,15 @@ def create_directory_tree(root_path: Path):
     -Returns
         - None
     """
-    images = root_path / "images"
-    if images.exists():
-        rmtree(images)
-    images.mkdir(exist_ok=True)
-    annotations = root_path / "annotations"
-    if annotations.exists():
-        rmtree(annotations)
-    annotations.mkdir(exist_ok=True)
-    labels = root_path / "labels"
-    if labels.exists():
-        rmtree(labels)
-    labels.mkdir(exist_ok=True)
-    for path in [images, annotations, labels]:
-        for sub_path in ["train", "val", "test"]:
-            (path / sub_path).mkdir(exist_ok=True)
+    data_types = ["train", "val", "test"]
+    folder_types = ["images", "annotations", "labels"]
+    for data_type in data_types:
+        data_type_path = root_path / data_type
+        for folder_type in folder_types:
+            folder_type_path = data_type_path / folder_type
+            if folder_type_path.exists():
+                rmtree(folder_type_path)
+            folder_type_path.mkdir(parents=True, exist_ok=True)
 
     print(f"Directory tree created at {root_path}")
 
@@ -116,9 +111,9 @@ def move_files(*dfs, root_dir) -> None:
     for df, df_name in zip(dfs, df_names):
         print(f"Copying files for {df_name}\n")
         img_dirs = df["img_path"].to_list()
-        img_dest = [root_dir / "images" / df_name / file.name for file in img_dirs]
+        img_dest = [root_dir / df_name / "images" / file.name for file in img_dirs]
         ann_dirs = df["anno_path"].to_list()
-        ann_dest = [root_dir / "annotations" / df_name / file.name for file in ann_dirs]
+        ann_dest = [root_dir / df_name / "annotations" / file.name for file in ann_dirs]
 
         print(f"Copying {len(img_dirs)} images\n")
         thread_map(copy, img_dirs, img_dest)
@@ -130,7 +125,7 @@ def move_files(*dfs, root_dir) -> None:
     move(root_dir / "test_set", root_dir / "images" / "evaluate_set")
     rmtree(root_dir / "training_set")
 
-    print("Finished moving files")
+    print("Fininshed moving files")
 
 
 # %% [markdown]
@@ -140,23 +135,32 @@ def move_files(*dfs, root_dir) -> None:
 # %%
 class Config:
     def __init__(self):
-        self.train_split = 0.8
-        self.val_split = 0.1
+        self.train_split = 0.7
+        self.val_split = 0.2
         self.test_split = 0.1
 
 
-# %%
-config = Config()
-
-# %%
-root_dir = Path("../../data")
-
-# %% [markdown]
-# # $\text{Building directory tree}$
-
 if __name__ == "__main__":
+
+    # %%
+    config = Config()
+
+    # %%
+    root_dir = Path("../../data")
+
+    # %% [markdown]
+    # # $\text{Building directory tree}$
+
     # %%
     create_directory_tree(root_dir)
+    display_tree(
+        root_dir,
+        string_rep=False,
+        header=False,
+        max_depth=2,
+        show_hidden=False,
+        ignore_list=["test_set", "training_set"],
+    )
 
     # %% [markdown]
     # # $\text{Splitting data directory}$
