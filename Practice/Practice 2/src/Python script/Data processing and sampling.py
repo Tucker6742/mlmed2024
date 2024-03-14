@@ -3,15 +3,8 @@
 
 # %%
 import polars as pl
-import numpy as np
-import matplotlib.pyplot as plt
-import polars.selectors as cs
 from varname import argname
-import pathlib
 from pathlib import Path
-from PIL import Image
-import numpy.linalg as npla
-from matplotlib.patches import Ellipse
 from tqdm.contrib.concurrent import thread_map
 from shutil import copyfile, rmtree, move
 from directory_tree import display_tree
@@ -128,19 +121,16 @@ def move_files(*dfs, root_dir) -> None:
     print("Fininshed moving files")
 
 
-# %% [markdown]
-# # $\text{Config}$
-
-
-# %%
-class Config:
-    def __init__(self):
-        self.train_split = 0.7
-        self.val_split = 0.2
-        self.test_split = 0.1
-
-
 if __name__ == "__main__":
+    # %% [markdown]
+    # # $\text{Config}$
+
+    # %%
+    class Config:
+        def __init__(self):
+            self.train_split = 0.7
+            self.val_split = 0.2
+            self.test_split = 0.1
 
     # %%
     config = Config()
@@ -182,5 +172,3 @@ if __name__ == "__main__":
 
     # %%
     move_files(train_df, val_df, test_df, root_dir=root_dir)
-
-    # %%
