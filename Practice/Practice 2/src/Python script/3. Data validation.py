@@ -240,13 +240,17 @@ def plots(image_name: str, data_split_type: str, root_dir: Path):
 
 
 if __name__ == "__main__":
-    # %%
-    train_label_path = Path("../../data/train/labels")
+    split = "train"
+    index = 0
+    root_dir = Path("../../data")
 
-    train_label_df = get_df(train_label_path)
+    # %%
+    split_label_path = Path("../../data/{split}/labels")
+
+    split_label_path = get_df(split_label_path)
 
     # %%
-    error_image = train_label_df.with_columns(
+    error_image = split_label_path.with_columns(
         has_negative_value=pl.min_horizontal(
             "x1", "x2", "x3", "x4", "y1", "y2", "y3", "y4"
         )
@@ -259,4 +263,4 @@ if __name__ == "__main__":
 
     # %%
     i = 0
-    plots(error_image["image_name"][i], "train", Path("../../data"))
+    plots(error_image["image_name"][index], split, root_dir)
