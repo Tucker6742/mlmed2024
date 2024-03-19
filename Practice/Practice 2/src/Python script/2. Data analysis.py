@@ -263,7 +263,7 @@ def plot_ellipse_sample_data(
     - Returns
         - None
     """
-    fig, ax = plt.subplots(2, 2, figsize=(10, 10), layout="constrained")
+    fig, ax = plt.subplots(2, 2, figsize=(10, 8), layout="constrained")
     ax = ax.flatten()
     for i, file_name in enumerate(file_names):
         row = data.filter(data["image_name"] == file_name)
@@ -280,7 +280,10 @@ def plot_ellipse_sample_data(
         ax[i].add_patch(ellipse)
         ax[i].set_title(file_name)
 
-    fig.suptitle(f"Ellipse samples from {df_name} data")
+    fig.suptitle(
+        f"Sample images in {df_name} with their corresponding ellipse annotation",
+        fontsize=15,
+    )
     plt.show()
 
 
@@ -301,7 +304,7 @@ def plot_rectangle_sample_data(
     - Returns:
         None
     """
-    fig, axes = plt.subplots(2, 2, figsize=(10, 10), layout="constrained")
+    fig, axes = plt.subplots(2, 2, figsize=(10, 8), layout="constrained")
     axes = axes.flatten()
     for i, ax in enumerate(axes):
         image_path = Path(
@@ -325,7 +328,8 @@ def plot_rectangle_sample_data(
         ax.add_patch(rec)
         ax.set_title(file_name[i])
     fig.suptitle(
-        f"Sample images in {df_name} with their corresponding oriented bounding box annotation"
+        f"Sample images in {df_name} with their corresponding oriented bounding box annotation",
+        fontsize=15,
     )
     plt.show()
 
@@ -346,7 +350,7 @@ def plot_data(data: pl.DataFrame, root_dir: Path, *args, **kwargs) -> None:
 
     df_name = argname("data").split("_")[1]
 
-    file_names = data["image_name"][:4].to_list()
+    file_names = data["image_name"].sample(fraction=1, shuffle=True)[:4].to_list()
     plot_ellipse_sample_data(file_names, data, df_name)
 
     plot_rectangle_sample_data(file_names, data, df_name)
@@ -354,41 +358,44 @@ def plot_data(data: pl.DataFrame, root_dir: Path, *args, **kwargs) -> None:
 
 # %% [markdown]
 # # $\text{Reads and Analyze data}$
-if __name__ == "__main__":
-    # %%
-    root_dir = Path("../../data")
 
-    # %%
-    data_path_train: pathlib.Path = Path("../../data/train")
-    data_train: pl.DataFrame = formatting_data(data_path_train, root_dir)
-    data_train.head()
+# %%
+root_dir = Path("../../data")
 
-    # %%
-    data_path_val = Path("../../data/val")
-    data_val: pl.DataFrame = formatting_data(data_path_val, root_dir)
-    data_val.head()
+# %%
+data_path_train: pathlib.Path = Path("../../data/train")
+data_train: pl.DataFrame = formatting_data(data_path_train, root_dir)
+data_train.head()
 
-    # %%
-    data_path_test = Path("../../data/test")
-    data_test: pl.DataFrame = formatting_data(data_path_test, root_dir)
-    data_test.head()
+# %%
+data_path_val = Path("../../data/val")
+data_val: pl.DataFrame = formatting_data(data_path_val, root_dir)
+data_val.head()
 
-    # %% [markdown]
-    # # $\text{Make OBB labels}$
+# %%
+data_path_test = Path("../../data/test")
+data_test: pl.DataFrame = formatting_data(data_path_test, root_dir)
+data_test.head()
 
-    # %%
-    write_oob_labels(data_train, root_dir)
-    write_oob_labels(data_val, root_dir)
-    write_oob_labels(data_test, root_dir)
+# %% [markdown]
+# # $\text{Make OBB labels}$
 
-    # %% [markdown]
-    # # $\text{Plot data}$
+# %%
+write_oob_labels(data_train, root_dir)
+write_oob_labels(data_val, root_dir)
+write_oob_labels(data_test, root_dir)
 
-    # %%
-    plot_data(data_train, root_dir)
+# %% [markdown]
+# # $\text{Plot data}$
 
-    # %%
-    plot_data(data_val, root_dir)
+# %%
+plot_data(data_train, root_dir)
 
-    # %%
-    plot_data(data_test, root_dir)
+# %%
+plot_data(data_val, root_dir)
+
+# %%
+plot_data(data_test, root_dir)
+
+# %% [markdown]
+# # $\text{Data analysis}$

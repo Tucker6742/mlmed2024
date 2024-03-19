@@ -7,7 +7,7 @@ src/Jupyter notebook/lightning_logs/
 **/Report/*.fls
 **/Report/*.toc
 **/Report/*.out
-*.log
+**/Report/*.log
 **/Report/*.gz
 Test/
 Report/ECGReport.pdf

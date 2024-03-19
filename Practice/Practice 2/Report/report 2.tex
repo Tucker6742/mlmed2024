@@ -1,0 +1,460 @@
+\documentclass[14pt]{extreport}
+
+\usepackage{amssymb, amsfonts, amsmath,mathtools}
+\usepackage{bbm}
+\usepackage{multicol}
+\usepackage[utf8]{vietnam}
+\usepackage[main=english, vietnamese]{babel}
+\usepackage{moresize}
+\usepackage[document]{ragged2e}
+\usepackage{changepage}
+\usepackage{graphicx}
+\usepackage{tocloft}
+\usepackage{etoolbox}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage[export]{adjustbox}
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage[
+            left=1in,
+            right=1in,
+            top=1in,
+            bottom=1in,
+            ]{geometry}
+\usepackage{subcaption}
+\usepackage{setspace}
+
+% Font size edit
+\newcommand{\fontset}[3]{\fontsize{#1}{#2}\selectfont {#3}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+
+% --------------------------------------------------------
+
+% TOC setting
+\renewcommand\cftchapfont{\large\bfseries}
+\renewcommand\cftsecfont{\large}
+\renewcommand\cftchappagefont{\large\bfseries}
+\renewcommand\cftsecpagefont{\large}
+\renewcommand\cftchapafterpnum{\par\addvspace{10pt}}
+\renewcommand\cftsecafterpnum{\par\addvspace{5pt}}
+\renewcommand\cftsubsecafterpnum{\par\addvspace{5pt}}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+% --------------------------------------------------------
+
+% Chapter setting
+\titleformat{\chapter}{\Large\bfseries}{\thechapter.}{10pt}{\Large\bf}
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{\par}{}{}
+\makeatother
+
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+\titlespacing*{\chapter}{0pt}{0pt}{0pt}
+
+% --------------------------------------------------------
+
+% Caption setting
+\captionsetup[table]{hypcap=false}
+
+% --------------------------------------------------------
+
+% Table setting
+\renewcommand\tabularxcolumn[1]{m{#1}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% --------------------------------------------------------
+
+% Bib setting
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+
+% --------------------------------------------------------
+
+% Math functions
+\DeclareMathOperator*{\atan2}{atan2}
+
+% --------------------------------------------------------
+
+\begin{document}
+
+% --------------------------------------------------------
+% Title page
+\begin{titlepage}
+    \begin{center}
+        \begin{adjustwidth}{-100pt}{-100pt}
+            \centering
+            {\fontsize{20}{15}\selectfont UNIVERSITY OF SCIENCE AND TECHNOLOGY OF HANOI}
+            \vspace{1cm}
+
+            \begin{figure}[H]
+                \includegraphics[max width=\linewidth]{../../../Figure/Logopad.png}
+            \end{figure}
+            \vspace{2cm}
+        \end{adjustwidth}
+        \linespread{1}\LARGE \bfseries Automated measurement of fetal head circumference in ultrasound images using deep learning
+        \newline
+        \vspace{4cm}
+        \textbf{\Large Nguyễn Phan Gia Bảo}
+        \newline
+        \vspace{1cm}
+        \textbf{\Large BI12-048}
+        \date{}
+    \end{center}
+\end{titlepage}
+
+% --------------------------------------------------------
+
+% TOC
+\begingroup\singlespacing
+\tableofcontents
+\endgroup
+\clearpage
+
+% --------------------------------------------------------
+
+\chapter{Introduction}
+Fetal head circumference (HC) is a crucial biometric parameter used to assess fetal growth and development during pregnancy. Accurate measurement of HC is essential for detecting potential abnormalities, such as microcephaly or macrocephaly, and for monitoring the overall health of the fetus. Traditionally, HC measurement is performed manually by trained sonographers using ultrasound images, which is time-consuming, subjective, and prone to inter- and intra-observer variability.
+
+To overcome these limitations, automated methods for measuring fetal HC have been proposed in recent years. These methods aim to improve the accuracy, consistency, and efficiency of HC measurement, reducing the workload of healthcare professionals and enhancing the quality of prenatal care. Among various approaches, deep learning techniques have shown promising results in medical image analysis, including fetal biometry.
+
+In this study, we propose an automated method for measuring fetal HC in ultrasound images using the YOLOv8 OBB (Oriented Bounding Box) model, a state-of-the-art deep learning object detection algorithm. The YOLOv8 OBB model is designed to detect and localize objects with arbitrary orientations, making it well-suited for detecting the elliptical shape of the fetal head in ultrasound images.
+
+Our approach involves training the YOLOv8 OBB model on a large dataset of annotated ultrasound images, where the fetal head is manually delineated by expert sonographers. The trained model is then used to automatically detect and locate the fetal head in new, unseen ultrasound images, providing an oriented bounding box (OBB) that encapsulates the head region. From the OBB, we calculate the ellipse that best fits the bounding box using ellipse fitting techniques. Finally, the HC is derived from the parameters of the fitted ellipse.
+
+
+\clearpage
+\chapter{Background}
+
+\section{Fetal Head Circumference Measurement}
+
+The fetal head circumference is typically measured during routine prenatal ultrasound examinations. During the ultrasound, the sonographer or healthcare provider uses the ultrasound probe to obtain an image of the fetal head in a specific plane, known as the biparietal diameter (BPD) view. This view allows for an accurate measurement of the diameter of the fetal head from one side to the other.
+
+The fetal head circumference is calculated based on the BPD measurement and other factors, such as the gestational age of the fetus. This measurement is then plotted on a growth chart, which compares the fetal head circumference to established reference ranges for different gestational ages.
+
+Monitoring the fetal head circumference is crucial for several reasons:
+
+\begin{itemize}
+    \item Growth assessment: The fetal head circumference provides information about the overall growth and development of the fetus. Deviations from the expected range may indicate potential growth problems or underlying conditions.
+    \item Brain development: The fetal head circumference is closely related to brain growth and development. Abnormalities in head circumference measurements may be indicative of conditions that affect brain development, such as microcephaly (abnormally small head) or macrocephaly (abnormally large head).
+    \item Congenital anomalies: Certain congenital anomalies or genetic disorders can affect the size and shape of the fetal head, which may be detected through head circumference measurements.
+    \item Gestational age estimation: In some cases, fetal head circumference measurements can assist in estimating the gestational age of the fetus, particularly when the last menstrual period is unknown or uncertain.
+\end{itemize}
+
+Regular monitoring of the fetal head circumference, along with other fetal biometric measurements, is an essential part of prenatal care. It helps healthcare providers identify potential concerns and make informed decisions regarding the management of the pregnancy and the well-being of the fetus.
+
+\section{Oriented Bounding Box (OBB)}
+
+An oriented bounding box (OBB) is a rectangular box that is oriented to align with the orientation of an object in an image. Unlike an axis-aligned bounding box (AABB), which is aligned with the x and y axes of the image, an OBB can be rotated to fit the orientation of the object, allowing for a more accurate localization and description of the object's shape.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering, margin=2cm}
+    \includegraphics[max width=\linewidth]{../Figure/obb yolov8.png}
+    \caption{Oriented Bounding Box (OBB) representation of an object in an image.}
+    \label{fig:obb yolov8}
+\end{figure}
+
+
+
+In the context of object detection and localization, OBBs are used to represent the spatial extent and orientation of objects in images. They are particularly useful for detecting objects with non-axis-aligned orientations, such as vehicles, buildings, or other structures that may appear at arbitrary angles in the image.
+
+The use of OBBs in object detection and localization tasks has become increasingly popular, especially in applications where the orientation of the object is an important characteristic. For example, in the context of autonomous driving, OBBs are used to detect and localize vehicles on the road, taking into account their orientation and aspect ratio.
+
+In the context of medical image analysis, OBBs can be used to detect and localize anatomical structures with non-axis-aligned orientations, such as the fetal head in ultrasound images. By using OBBs to encapsulate the head region, it is possible to accurately represent the elliptical shape of the head and derive biometric measurements, such as the fetal head circumference, from the OBB parameters.
+
+\chapter{Dataset}
+
+\section{Data overview}
+We use the dataset Automated measurement of fetal head circumference using 2D ultrasound images\cite{dataset}
+The data is divided into a training set of 999 images and a test set of 335 images. The size of each 2D ultrasound image is 800 $\times$ 540 pixels with a pixel size ranging from 0.052 to 0.326 mm. The training set also includes an image with the manual annotation of the head circumference.
+
+The dataset contain 2 csv files for the train and test set that contains the following columns:
+\begin{itemize}
+    \item \textbf{filename}: the name of the image file
+    \item \textbf{pixel size(mm)}: the pixel size of the image in millimeters
+    \item \textbf{head\_circumference(mm)}: the head circumference of the fetus in millimeters (only available in the training set)
+\end{itemize}
+
+\begin{figure}[H]
+    \captionsetup{justification=centering, margin=3.4cm}
+    \begin{subfigure}{0.5\textwidth}
+        \includegraphics[max width=1\linewidth]{../Figure/068_2HC.png}
+        \captionsetup{justification=justified}
+        \caption{Original image}
+        \label{fig:original image}
+    \end{subfigure}~
+    \hspace*{0.5in}
+    \begin{subfigure}{0.5\textwidth}
+        \includegraphics[max width=1\linewidth]{../Figure/068_2HC_Annotation.png}
+        \centering
+        \captionsetup{justification=justified}
+        \caption{Annotated image}
+        \label{fig:annotated image}
+    \end{subfigure}
+    \caption{Example of an original ultrasound image and its annotated version.}
+    \label{fig:original and annotated image}
+\end{figure}
+
+\section{Data preprocessing}
+
+The dataset is preprocessed to ensure that the images are in a suitable format for training the YOLOv8 OBB model. The model requires the labels of each images to be in the format of:
+
+\begin{center}
+    \texttt{c, x1, y1, x2, y2, x3, y3, x4, y4}
+\end{center}
+where:
+\begin{itemize}
+    \item \texttt{c} is the class label (in this case, 0 for the fetal head since there is only 1 class needed to be detected)
+    \item \texttt{x1, y1, x2, y2, x3, y3, x4, y4} are the coordinates of the four corners of the oriented bounding box (OBB) that encapsulates the head region
+\end{itemize}
+
+The pixels of the annotated images are first used to calculate the ellipse parameters that best fit the head region.
+
+Every ellipse can be represented by the following equation:
+\begin{align*}
+    Ax^2 + Bxy + Cy^2 + Dx + Ey + F                                                                   & = 0  \\
+    Ax^2 + Bxy + Cy^2 + Dx + Ey                                                                       & = -F \\
+    \dfrac{A}{-F}\ x^2 + \dfrac{B}{-F}\ xy + \dfrac{C}{-F}\ y^2 + \dfrac{D}{-F}\ x + \dfrac{E}{-F}\ y & = 1  \\
+    A'x^2 + B'xy + C'y^2 + D'x + E'y                                                                  & = 1  \\
+\end{align*}
+where A', B', C', D', E' are the coefficients of the ellipse that best fits the head region that we need to find for each image.
+
+For every pixel in the annotation image $(x_j, y_j)$ that belong on the ellipse, it must satisfy the equation above. The problem now turn into a linear regression problem where the coefficients of the ellipse are the parameters to be estimated. The least square method is used to estimate the parameters of the ellipse.
+
+$$ \begin{bmatrix}
+        x_1^2  & x_1y_1 & y_1^2  & x_1    & y_1    \\
+        x_2^2  & x_2y_2 & y_2^2  & x_2    & y_2    \\
+        \vdots & \vdots & \vdots & \vdots & \vdots \\
+        x_n^2  & x_ny_n & y_n^2  & x_n    & y_n    \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        A' \\
+        B' \\
+        C' \\
+        D' \\
+        E' \\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        1      \\
+        1      \\
+        \vdots \\
+        1      \\
+    \end{bmatrix} $$
+
+After we obtain the coefficients of the ellipse, we can calculate the parameters of the ellipse using the following formulas:
+
+\begin{flalign*}
+     & a            = \dfrac{\sqrt{2\left(AE^2+CD^2-BDE+(B^2-4AC)F\right)\left((A+C)+\sqrt{(A-C)^2+B^2}\right)}}{B^2-4AC} &  & \\
+     & b            = \dfrac{\sqrt{2\left(AE^2+CD^2-BDE+(B^2-4AC)F\right)\left((A+C)-\sqrt{(A-C)^2+B^2}\right)}}{B^2-4AC} &  & \\
+     & x_0          = \dfrac{2CD - BE}{B^2-4AC}                                                                           &  & \\
+     & y_0          = \dfrac{2AE - BD}{B^2-4AC}                                                                           &  & \\
+     & \theta(rad)  = \dfrac{1}{2} \atan2(-B, C-A)
+\end{flalign*}
+where:
+\begin{itemize}
+    \item $a$ and $b$ are the semi-major and semi-minor axes of the ellipse
+    \item $(x_0, y_0)$ is the center of the ellipse
+    \item $\theta$ is the angle of rotation of the ellipse
+    \item $\atan2$ is the four-quadrant inverse tangent function
+          \begin{equation*}
+              \atan2(y, x) =
+              \begin{dcases}
+                  \arctan\left(\dfrac{y}{x}\right)       & \text{if } x > 0                       \\
+                  \arctan\left(\dfrac{y}{x}\right) + \pi & \text{if } x < 0 \text{ and } y \geq 0 \\
+                  \arctan\left(\dfrac{y}{x}\right) - \pi & \text{if } x < 0 \text{ and } y < 0    \\
+                  +\dfrac{\pi}{2}                        & \text{if } x = 0 \text{ and } y > 0    \\
+                  -\dfrac{\pi}{2}                        & \text{if } x = 0 \text{ and } y < 0    \\
+                  \text{undefined}                       & \text{if } x = 0 \text{ and } y = 0    \\
+              \end{dcases}
+          \end{equation*}
+    \item $F = -1, A = A', B = B', C = C', D = D', E = E'$
+\end{itemize}
+% \vspace{0.5cm}
+
+After obtaining the parameters of the ellipse, we can calculate the coordinates of the four corners of the oriented bounding box (OBB) that encapsulates the head region using the following formulas:
+
+\begin{equation*}
+    \begin{aligned}
+        x_1 & = x_0 + a \cos(\theta) \\
+        x_2 & = x_0 - b \sin(\theta) \\
+        x_3 & = x_0 - a \cos(\theta) \\
+        x_4 & = x_0 + b \sin(\theta) \\
+    \end{aligned}
+    \hspace*{4cm}
+    \begin{aligned}
+        y_1 & = y_0 + a \sin(\theta) \\
+        y_2 & = y_0 + b \cos(\theta) \\
+        y_3 & = y_0 - a \sin(\theta) \\
+        y_4 & = y_0 - b \cos(\theta) \\
+    \end{aligned}
+\end{equation*}
+
+Here are the annotated image after the processing step.
+
+\begin{figure}[H]
+    \begin{adjustwidth}{-3cm}{-3cm}
+        \centering
+        \captionsetup{justification=centering, margin=3.4cm}
+        \begin{subfigure}{0.6\textwidth}
+            \includegraphics[max width=1\linewidth]{../Figure/ellipse anno train.png}
+            \captionsetup{justification=justified}
+            \caption{Ellipse annotations}
+            \label{fig:ellipse annotations}
+        \end{subfigure}~
+        \begin{subfigure}{0.6\textwidth}
+            \includegraphics[max width=1\linewidth]{../Figure/obb anno train.png}
+            \captionsetup{justification=justified}
+            \caption{OBB annotations}
+            \label{fig:obb annotations}
+        \end{subfigure}
+        \caption{Ellipse and OBB annotation images after preprocessing}
+        \label{fig:ellispe and obb annotation}
+    \end{adjustwidth}
+\end{figure}
+
+\section{Data analysis}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[max width=1\linewidth, keepaspectratio]{../Figure/labels_correlogram.jpg}
+    \caption{Correlogram between bounding boxes parameters}
+    \label{correlogram of bbox params}
+\end{figure}
+As it can be shown here, the x and the y value seem to follow the normal distribution with the mean of 0.5, which is expected since the baby should stay in the middle of the image. The width and the height are more skewed to the right, most images have the width and the height of the bounding box to be around 0.6 - 0.7. The correlation between the width and the height also seem to be very high, almost a linear relationship. This show that most baby have the head to be in a similar aspect ratio, only different in size. It can be seen clearly in the figure bellow.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering, margin=2.5cm}
+    \includegraphics[max width=0.9\linewidth, keepaspectratio]{../Figure/labels.jpg}
+    \caption{Scatter plot between (width - height) and (x-y) of the bounding boxes}
+    \label{scatter plot of bbox params}
+\end{figure}
+
+\chapter{Methodology}
+\section{YOLOv8 model}
+\begin{figure}[H]
+    \begin{adjustwidth}{-100pt}{-100pt}
+        \centering
+        \captionsetup{justification=centering,margin=1.5cm}
+        \includegraphics[width=0.9\pdfpagewidth, keepaspectratio]{../Figure/yolo achitecture.jpg}
+        \caption{YOLOv8 architecture}
+        \label{fig:YOLOv8}
+    \end{adjustwidth}
+\end{figure}
+We utilize YOLOv8 nano version for the detection phase, as it is the new state-of-the-art computer vision model. This latest version has the same architecture as YOLOv5 with numerous improvements, such as a new neural network architecture that utilizes both Feature Pyramid Network (FPN) and Path
+Aggregation Network (PAN). These features make it easier to annotate images for training the model. The FPN works by gradually reducing the spatial resolution of the input image while increasing the number of feature channels. This results in feature maps capable of detecting objects at different scales and resolutions. The PAN architecture, on the other hand, aggregates features from different levels of the network through skip connections. By doing so, the network can better capture features at multiple scales and resolutions, which is crucial for accurately detecting objects of different sizes and shapes\cite{yolov1 to 8}.
+
+YOLOv8 uses CSPDarknet53\cite{yolov3} as its backbone, a deep neural network that extracts features at multiple resolutions (scales) by progressively down-sampling the input image. The feature maps produced at different resolutions contain information about objects at different scales in the image and different
+levels of detail and abstraction. YOLOv8 can incorporate different feature maps at different scales to learn about object shapes and textures, which helps it achieve high accuracy in most object detection tasks. YOLOv8 backbone consists of four sections, each with a single convolution followed by a c2f module\cite{yolov8}. The c2f module is a new introduction to CSPDarknet53. The module comprises splits where one end goes through a bottleneck module (Two 3x3 convolutions with residual connections). The bottleneck module output is further split N times where N corresponds to the YOLOv8 model size. These splits are all finally concatenated and passed through one final convolution layer. This final layer is the layer where we will get the activations.
+
+\section{Head circumference calculation}
+
+After obtaining the OBB that encapsulates the head region, we can calculate the head circumference using the following formula:
+
+\begin{equation*}
+    \text{Head circumference} = \pi \times \left[3(a+b)-\sqrt{10ab+3\left(a^2+b^2\right)}\right]
+\end{equation*}
+where:
+\begin{itemize}
+    \item $a$ and $b$ are the semi-major and semi-minor axes of the ellipse converted to millimeters using the pixel size given in the dataset
+    \item $\pi$ is the mathematical constant pi
+\end{itemize}
+\chapter{Evaluation}
+To evaluate the performance of the model, I used the following metrics:
+\begin{itemize}
+    \item F1 curve: The F1 curve is the harmonic mean of precision and recall. It is a single scalar value that represents the model's performance across a range of thresholds. The F1 curve is a useful metric for evaluating the trade-off between precision and recall, as it captures the model's performance at different operating points.
+    \item Precision-Recall curve: The precision-recall curve is a graphical representation of the trade-off between precision and recall at different thresholds. It is a useful tool for evaluating the model's performance across a range of operating points and for comparing different models.
+    \item Confusion matrix: The confusion matrix is a table that summarizes the model's predictions and the ground truth labels. It provides a detailed breakdown of the model's performance, including true positives, false positives, true negatives, and false negatives.
+    \item Precision-Confidence curve: The precision-confidence curve is a graphical representation of the trade-off between precision and confidence at different thresholds.
+    \item Recall-Confidence curve: The recall-confidence curve is a graphical representation of the trade-off between recall and confidence at different thresholds.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[max width=0.9\linewidth, keepaspectratio]{../Figure/PR_curve.png}
+    \caption{Precision-Recall curve}
+    \label{precision recall curve}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[max width=0.9\linewidth, keepaspectratio]{../Figure/R_curve.png}
+    \caption{Recall-Confidence curve}
+    \label{recall confidence curve}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[max width=0.9\linewidth, keepaspectratio]{../Figure/P_curve.png}
+    \caption{Precision-Confidence}
+    \label{precision confidence curve}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[max width=0.9\linewidth, keepaspectratio]{../Figure/F1_curve.png}
+    \caption{F1 curve}
+    \label{F1 curve}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[max width=0.9\linewidth, keepaspectratio]{../Figure/confusion_matrix_normalized.png}
+    \caption{Normalized confusion matrix}
+    \label{normalized confusion matrix}
+\end{figure}
+
+The model achieved an F1 score of 1 at confidence 0.828, which is a very high score. The precision and recall are also very high, with the precision being 1 at confidence 0.878 and the recall being 1 at confidence 0. The confusion matrix also shows that the model has perfect prediction results, with no false positive or false negative. This is a very good result, showing that the model is able to detect the fetal head with high accuracy. The model also achieved RMSE of 4.173, which is a very low value, showing that the model is able to predict the head circumference with high accuracy.
+
+\chapter{Conclusion}
+
+In this study, we proposed an automated method for measuring fetal head circumference in ultrasound images using the YOLOv8 OBB model, a state-of-the-art deep learning object detection algorithm. The model was trained on a large dataset of annotated ultrasound images, where the fetal head was manually delineated by expert sonographers. The trained model was then used to automatically detect and locate the fetal head in new, unseen ultrasound images, providing an oriented bounding box (OBB) that encapsulates the head region. From the OBB, we calculated the ellipse that best fits the bounding box using ellipse fitting techniques. Finally, the head circumference was derived from the parameters of the fitted ellipse.
+
+The model achieved high accuracy in detecting the fetal head. The results demonstrate the potential of deep learning techniques for automated fetal biometry and suggest that the proposed method could be a valuable tool for improving the accuracy, consistency, and efficiency of fetal head circumference measurement in clinical practice.
+
+We believe that the proposed method has the potential to enhance the quality of prenatal care and contribute to the early detection of fetal growth abnormalities and developmental disorders. Future work will focus on further refining the model and evaluating its performance on larger and more diverse datasets, as well as integrating it into clinical practice to assess its real-world impact on prenatal care.
+
+\clearpage
+\chapter{References}
+\begingroup
+\renewcommand{\chapter}[2]{}
+\begin{thebibliography}{}
+
+    \bibitem{dataset}
+    Thomas L. A. van den Heuvel, Dagmar de Bruijn, Chris L. de Korte and Bram van Ginneken. Automated measurement of fetal head circumference using 2D ultrasound images [Data set]. Zenodo. http://doi.org/10.5281/zenodo.1322001
+
+    \bibitem{yolov1 to 8}
+    Terven, J. R., Córdova-Esparza, D.-M., \& Romero-González, J.-A. (2023). A Comprehensive Review of YOLO Architectures in Computer Vision: From YOLOv1 to YOLOv8 and YOLO-NAS. \textit{Machine Learning and Knowledge Extraction}. doi:10.3390/make5010007
+
+    \bibitem{yolov3}
+    Redmon, J., \& Farhadi, A. (2018). YOLOv3: An Incremental Improvement. \textit{ArXiv}, abs/1804.02767. Retrieved from \url{https://api.semanticscholar.org/CorpusID:4714433}
+
+    \bibitem{yolov8}
+    Solawetz, J. (2023, Dec). What is Yolov8? the ultimate guide. \textit{Roboflow Blog}. Retrieved from \url{https://blog.roboflow.com/whats-new-in-yolov8/}
+\end{thebibliography}
+
+
+\end{document}
+
