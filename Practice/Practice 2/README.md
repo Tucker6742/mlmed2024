@@ -20,11 +20,11 @@
     Edit the `root_dir` in the `main` function to match the `data` directory tree
 
 - Behavior
-    Setup the train/val/test split for data, create directory tree, and setup files order in folders
+    Set up the train/val/test split for data, create directory tree, and setup files order in folders
 
 ## `2. Data analysis.py`
 - Usage
-    Edit `root_dir`  in `main` function to match the directory tree
+    Edit `root_dir` in `main` function to match the directory tree
 
 - Behavior
     Setup train/val/test dataframe, make OBB labels for each split and plot ellipse + OBB for some image in train/val/test

@@ -17,16 +17,16 @@ from directory_tree import display_tree
 def sampling_index(dataframe: pl.DataFrame, config) -> list[pl.DataFrame]:
     """
     -Parameters
-        dataframe: pl.DataFrame
-            - The dataframe to be used for sampling
-        config: dict
-            - The configuration dictionary
+        dataframe: pl.DataFrame (The dataframe to be used for sampling)
+        config: dict (The configuration dictionary)
 
     - Behaviour
         - This function will return the indices of the dataframe to be used for sampling of train, val, set
 
     -Returns
-        - The indices of the dataframe to be used for sampling of train, val, set
+        train_df: pl.DataFrame (The dataframe to be used for training)
+        val_df: pl.DataFrame (The dataframe to be used for validation)
+        test_df: pl.DataFrame (The dataframe to be used for testing)
     """
 
     dataframe = dataframe.sample(fraction=1, shuffle=True)
@@ -43,14 +43,13 @@ def sampling_index(dataframe: pl.DataFrame, config) -> list[pl.DataFrame]:
 def create_directory_tree(root_path: Path):
     """
     -Parameters
-        root_path: Path
-            - The current path
+        root_path: Path (The root directory)
 
     - Behaviour
         - This function will create the directory tree for the current path
 
     -Returns
-        - None
+        None
     """
     data_types = ["train", "val", "test"]
     folder_types = ["images", "annotations", "labels"]
@@ -69,35 +68,31 @@ def create_directory_tree(root_path: Path):
 def copy(src_dir: Path, dest_dir: Path):
     """
     -Parameters
-        src_dir: Path
-            - The source directory
-        dest_dir: Path
-            - The destination directory
+        src_dir: Path (The source directory)
+        dest_dir: Path (The destination directory)
 
     - Behaviour
-        - This function will move the file from the source directory to the destination directory
+        - This function will copy the file from the source directory to the destination directory
 
     -Returns
-        - None
+        None
     """
     src = src_dir
     dest = dest_dir
     copyfile(src, dest)
-    # print(f"Moved {file_name} from {src_dir} to {dest_dir}")
 
 
 # %%
 def move_files(*dfs, root_dir) -> None:
     """
     - Parameters
-        dfs: pl.DataFrame
-            - The dataframes that contain file to be moved
+        dfs: pl.DataFrame (The dataframes that contain file to be moved)
 
     - Behaviour
         - This function will move the files from the source directory to the destination directory
 
     - Returns
-        - None
+        None
     """
     df_names = [df.split("_")[0] for df in argname("dfs")]
 

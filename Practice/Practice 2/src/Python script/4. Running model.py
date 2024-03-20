@@ -15,7 +15,6 @@ import numpy as np
 
 # %%
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 # %% [markdown]
@@ -24,6 +23,19 @@ import torch.nn.functional as F
 
 # %%
 def ellipse_circumference(a: float, b: float, size: float) -> float:
+    """
+    - Parameters:
+        - a: float (major axis)
+        - b: float, (minor axis)
+        - size: float (size of the pixel (mm))
+
+    - Behavior:
+        - Calculate the circumference of an ellipse using the following formula:
+            - pi*(3*(a+b)-sqrt(10*a*b+3*(a**2+b**2)))
+
+    - Returns:
+        - float (circumference of the ellipse)
+    """
     a = a * size / 2
     b = b * size / 2
     return np.pi * (3 * (a + b) - np.sqrt(10 * a * b + 3 * (a**2 + b**2)))

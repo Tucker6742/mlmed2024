@@ -5,8 +5,6 @@
 import polars as pl
 import numpy as np
 import matplotlib.pyplot as plt
-from varname import argname
-import pathlib
 from pathlib import Path
 from PIL import Image
 import numpy.linalg as npla
@@ -20,6 +18,16 @@ from matplotlib.patches import Polygon
 
 # %%
 def read_label_file(label_file: Path):
+    """
+    - Parameters:
+        - label_file: Path to the label file
+
+    - Behavior:
+        - Reads the label file and returns the name and the coordinates of the bounding box
+
+    - Returns:
+        - A list with the name and the coordinates of the bounding box
+    """
     name = label_file.stem
     with open(label_file, "r") as f:
         line = f.readlines()[0].split(" ")
@@ -34,8 +42,7 @@ def get_ellipse_param(anno_path: Path | str, mode="xyabt") -> list[str | float]:
         - anno_path: Path (path to the annotation image)
 
     - Behavior
-
-        Given an annotation image, this function returns the parameters of the ellipse that best fits the annotation.
+        - Given an annotation image, this function returns the parameters of the ellipse that best fits the annotation.
 
     - Returns
         - list[str | float]: [file_name, x_center, y_center, width, height, angle]
@@ -96,23 +103,24 @@ def get_obb_point(
         - mode: str (mode of the output)
 
     - Behavior
-        Given an annotation image, this function returns the parameters of the oriented bounding box that best fits the annotation.
+        - Given an annotation image, this function returns the parameters of the oriented bounding box that best fits the annotation.
 
-        A: rightmost point after rotation
-        B: top point after rotation
-        C: leftmost point after rotation
-        D: bottom point after rotation
-        X: center of the ellipse
+        - A: rightmost point after rotation
+        - B: top point after rotation
+        - C: leftmost point after rotation
+        - D: bottom point after rotation
+        - X: center of the ellipse
 
-        O1: bbox point between A, B
-        O2: bbox point between B, C
-        O3: bbox point between C, D
-        O4: bbox point between D, A
+        - O1: bbox point between A, B
+        - O2: bbox point between B, C
+        - O3: bbox point between C, D
+        - O4: bbox point between D, A
 
-        OO1 = OA + AO1 = OA + XB
-        OO2 = OB + BO2 = OB + XC
-        OO3 = OC + CO3 = OC + XD
-        OO4 = OD + DO4 = OD + XA
+        - OO1 = OA + AO1 = OA + XB
+        - OO2 = OB + BO2 = OB + XC
+        - OO3 = OC + CO3 = OC + XD
+        - OO4 = OD + DO4 = OD + XA
+
     - Returns
         - list[str | float]: [file_name, x1, y1, x2, y2, x3, y3, x4, y4]
     """
@@ -142,7 +150,7 @@ def get_obb_point(
 def get_df(label_path: Path) -> pl.DataFrame:
     """
     - Parameters:
-        label_path: Path (Path of the label directory)
+        - label_path: Path (Path of the label directory)
 
     - Behavior
         - Read the each label file and convert it to a DataFrame
@@ -178,9 +186,9 @@ def get_df(label_path: Path) -> pl.DataFrame:
 def plots(image_name: str, data_split_type: str, root_dir: Path):
     """
     - Parameters:
-        image_name: str (Name of the image)
-        data_split_type: str (Type of the data split train/val/test)
-        root_dir: Path (Root directory of the dataset)
+        - image_name: str (Name of the image)
+        - data_split_type: str (Type of the data split train/val/test)
+        - root_dir: Path (Root directory of the dataset)
 
     - Behavior:
         - Read the image and the label file
@@ -240,12 +248,16 @@ def plots(image_name: str, data_split_type: str, root_dir: Path):
 
 
 if __name__ == "__main__":
+    # %% [markdown]
+    # # $\text{Setup parameters}$
+
+    # %%
     split = "train"
     index = 0
     root_dir = Path("../../data")
 
     # %%
-    split_label_path = Path("../../data/{split}/labels")
+    split_label_path = Path(f"../../data/{split}/labels")
 
     split_label_path = get_df(split_label_path)
 
@@ -262,5 +274,4 @@ if __name__ == "__main__":
     ).filter(pl.col("has_negative_value") | pl.col("has_over_one_value"))
 
     # %%
-    i = 0
     plots(error_image["image_name"][index], split, root_dir)

@@ -22,14 +22,23 @@ from matplotlib.patches import Polygon
 def get_ellipse_param(anno_path: Path | str, mode="xyabt") -> list[str | float]:
     """
     - Parameters
-        - anno_path: Path (path to the annotation image)
+        - anno_path: Path | str (path to the annotation image)
+        - mode: str (output format: xyabt | abcdef
+                - default: xyabt.
+                - xyabt: returns [file_name, x_center, y_center, width, height, angle]
+                - abcdef: returns [file_name, A, B, C, D, E, F]
+                - x_center, y_center: x and y coordinates of the center of the ellipse
+                - width, height: width and height of the ellipse
+                - angle: angle of the ellipse
+                - A, B, C, D, E, F: parameters of the ellipse equation Ax^2 + Bxy + Cy^2 + Dx + Ey + F = 0
+            )
 
     - Behavior
 
         Given an annotation image, this function returns the parameters of the ellipse that best fits the annotation.
 
     - Returns
-        - list[str | float]: [file_name, x_center, y_center, width, height, angle]
+        - list[str | float]: [file_name, x_center, y_center, width, height, angle] | [file_name, A, B, C, D, E, F]
     """
     if isinstance(anno_path, str):
         anno_path = Path(anno_path)
@@ -67,14 +76,13 @@ def get_ellipse_param(anno_path: Path | str, mode="xyabt") -> list[str | float]:
 
 
 # %%
-def get_obb_point(x, y, a, b, t, image_path, mode="xyxyxyxy") -> list[str | float]:
+def get_obb_point(x, y, a, b, t, image_path) -> list[str | float]:
     """
     - Parameters
         - anno_path: Path (path to the annotation image)
-        - mode: str (output format)
 
     - Behavior
-        Given an annotation image, this function returns the parameters of the oriented bounding box that best fits the annotation.
+        - Given an annotation image, this function returns the parameters of the oriented bounding box that best fits the annotation.
 
         A: rightmost point after rotation
         B: top point after rotation
@@ -112,8 +120,7 @@ def get_obb_point(x, y, a, b, t, image_path, mode="xyxyxyxy") -> list[str | floa
     x1, x2, x3, x4 = x_val
     y1, y2, y3, y4 = y_val
 
-    if mode == "xyxyxyxy":
-        return [x1, y1, x2, y2, x3, y3, x4, y4]
+    return [x1, y1, x2, y2, x3, y3, x4, y4]
 
 
 # %%
@@ -121,27 +128,16 @@ def formatting_data(
     data_path: pathlib.Path, root_dir: Path, *args, **kwargs
 ) -> pl.DataFrame:
     """
-
     - Parameters:
-
-        - `data_path`: pathlib.Path (path to the train folder)
-        - `root_dir`: pathlib.Path (path to the root directory)
-
+        - data_path: pathlib.Path (path to the data split folder)
+        - root_dir: pathlib.Path (path to the root directory)
 
     - Behavior:
-
-
-        Create `data` dataframe from image name, image path, `data_pixel` from image name, pixel size
-
-        It make `data_param` from the annotation path, and join `data` and `data_param` on `image_name` to get the ellipse parameters. Add the annotation path and the head circumference to the `data` dataframe.
-
+        - Create data dataframe from image name, image path, data_pixel from image name, pixel size
+        - It make data_param from the annotation path, and join data and data_param on image_name to get the ellipse parameters. Add the annotation path and the head circumference to the data dataframe.
 
     - Returns:
-
-        `data`: `pl.DataFrame `
-
-
-        (dataframe containing the image aname, image path, annotation path, and the ellipse parameters, the pixel size and the head circumference) if the data_path is the train folder.)
+        - data: pl.DataFrame (dataframe with image_name, image_path, annotation_path, x0, y0, a, b, theta, pixel_size, head_circumference)
 
 
     """
@@ -199,13 +195,13 @@ def write_an_obb(row_dict: dict[str, str | float]) -> None:
 
     - Behavior
 
-        Given a row dictionary, this function writes the oriented bounding box of the annotation image.
+        - Given a row dictionary, this function writes the oriented bounding box of the annotation image.
 
-        class: 0:head
-        x1, y1: highest point
-        x2, y2: rightmost point
-        x3, y3: lowest point
-        x4, y4: leftmost point
+        - class: 0: head
+        - x1, y1: highest point
+        - x2, y2: rightmost point
+        - x3, y3: lowest point
+        - x4, y4: leftmost point
 
     - Returns
         - None
@@ -235,8 +231,7 @@ def write_oob_labels(data: pl.DataFrame, root_dir: Path) -> None:
         - root_dir: Path (path to the root directory)
 
     - Behavior
-
-        Given an annotation directory, this function writes the parameters of the oriented bounding box that best fits the annotation to each text file using multi-threading.
+        - Given an annotation directory, this function writes the parameters of the oriented bounding box that best fits the annotation to each text file using multi-threading.
 
     - Returns
         - None
@@ -258,7 +253,7 @@ def plot_ellipse_sample_data(
         - df_name: str (name of the dataframe)
 
     - Behavior
-        Given a list of file names and a dataframe, this function plots the ellipse that best fits the annotation image.
+        - Given a list of file names and a dataframe, this function plots the ellipse that best fits the annotation image.
 
     - Returns
         - None
@@ -293,16 +288,15 @@ def plot_rectangle_sample_data(
 ) -> None:
     """
     - Parameters:
-        - `file_name`: list[str] (list of image names)
-        - `df_name`: str (name of the dataframe)
-        - `root_dir`: Path (path to the root directory)
+        - file_name: list[str] (list of image names)
+        - df_name: str (name of the dataframe)
+        - root_dir: Path (path to the root directory)
 
     - Behavior:
-
-            Plot some sample images with their corresponding oriented bounding box annotation.
+        - Plot some sample images with their corresponding oriented bounding box annotation.
 
     - Returns:
-        None
+        - None
     """
     fig, axes = plt.subplots(2, 2, figsize=(10, 8), layout="constrained")
     axes = axes.flatten()
@@ -338,14 +332,14 @@ def plot_rectangle_sample_data(
 def plot_data(data: pl.DataFrame, root_dir: Path, *args, **kwargs) -> None:
     """
     - Parameters:
-        - `data`: pl.DataFrame (dataframe containing the image aname, image path, annotation path, and the ellipse parameters, the pixel size and the head circumference)
-        - `root_dir`: Path (path to the root directory)
+        - data: pl.DataFrame (dataframe containing the image aname, image path, annotation path, and the ellipse parameters, the pixel size and the head circumference)
+        - root_dir: Path (path to the root directory)
 
     - Behavior:
-        Plot some sample images with their corresponding ellipse and oriented bounding box annotation.
+        - Plot some sample images with their corresponding ellipse and oriented bounding box annotation.
 
     - Returns:
-        None
+        - None
     """
 
     df_name = argname("data").split("_")[1]
@@ -356,46 +350,44 @@ def plot_data(data: pl.DataFrame, root_dir: Path, *args, **kwargs) -> None:
     plot_rectangle_sample_data(file_names, data, df_name)
 
 
-# %% [markdown]
-# # $\text{Reads and Analyze data}$
+if __name__ == "__main__":
+    # %% [markdown]
+    # # $\text{Reads and Analyze data}$
 
-# %%
-root_dir = Path("../../data")
+    # %%
+    root_dir = Path("../../data")
 
-# %%
-data_path_train: pathlib.Path = Path("../../data/train")
-data_train: pl.DataFrame = formatting_data(data_path_train, root_dir)
-data_train.head()
+    # %%
+    data_path_train: pathlib.Path = Path("../../data/train")
+    data_train: pl.DataFrame = formatting_data(data_path_train, root_dir)
+    data_train.head()
 
-# %%
-data_path_val = Path("../../data/val")
-data_val: pl.DataFrame = formatting_data(data_path_val, root_dir)
-data_val.head()
+    # %%
+    data_path_val = Path("../../data/val")
+    data_val: pl.DataFrame = formatting_data(data_path_val, root_dir)
+    data_val.head()
 
-# %%
-data_path_test = Path("../../data/test")
-data_test: pl.DataFrame = formatting_data(data_path_test, root_dir)
-data_test.head()
+    # %%
+    data_path_test = Path("../../data/test")
+    data_test: pl.DataFrame = formatting_data(data_path_test, root_dir)
+    data_test.head()
 
-# %% [markdown]
-# # $\text{Make OBB labels}$
+    # %% [markdown]
+    # # $\text{Make OBB labels}$
 
-# %%
-write_oob_labels(data_train, root_dir)
-write_oob_labels(data_val, root_dir)
-write_oob_labels(data_test, root_dir)
+    # %%
+    write_oob_labels(data_train, root_dir)
+    write_oob_labels(data_val, root_dir)
+    write_oob_labels(data_test, root_dir)
 
-# %% [markdown]
-# # $\text{Plot data}$
+    # %% [markdown]
+    # # $\text{Plot data}$
 
-# %%
-plot_data(data_train, root_dir)
+    # %%
+    plot_data(data_train, root_dir)
 
-# %%
-plot_data(data_val, root_dir)
+    # %%
+    plot_data(data_val, root_dir)
 
-# %%
-plot_data(data_test, root_dir)
-
-# %% [markdown]
-# # $\text{Data analysis}$
+    # %%
+    plot_data(data_test, root_dir)
