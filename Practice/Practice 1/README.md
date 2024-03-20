@@ -1,7 +1,7 @@
 # Usage
 
 1. Run `pip install -r requirements.txt`
-2. Downaload the [ECG Heartbeat Categorization Dataset](https://www.kaggle.com/datasets/shayanfazeli/heartbeat)
+2. Download the [ECG Heartbeat Categorization Dataset](https://www.kaggle.com/datasets/shayanfazeli/heartbeat)
 3. Run `Data analysis.py` or `Running model.py` for corresponding task in `src` folder
 
 
