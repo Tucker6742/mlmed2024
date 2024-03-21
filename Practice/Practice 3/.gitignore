@@ -1,1 +1,10 @@
-archive/
+data/
+Miscellaneous/
+results/
+**/Report/*.aux
+**/Report/*.fdb_latexmk
+**/Report/*.fls
+**/Report/*.toc
+**/Report/*.out
+**/Report/*.log
+**/Report/*.gz

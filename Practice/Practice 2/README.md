@@ -17,6 +17,7 @@
 ## `1. Data processing and sampling.py`
 
 - Usage
+
     Edit the `root_dir` in the `main` function to match the `data` directory tree
 
 - Behavior
@@ -24,6 +25,7 @@
 
 ## `2. Data analysis.py`
 - Usage
+
     Edit `root_dir` in `main` function to match the directory tree
 
 - Behavior
@@ -32,6 +34,7 @@
 ## `3. Data validation.py`
 
 - Usage
+  
     Edit 
     - `split` for type of data split (train/val/test)
     - `index` for the index of image in the split
@@ -43,6 +46,7 @@
 ## `4. Model training.py`
 
 - Usage
+
     Edit
     - `data_root_dir` for the root directory of the data
     - `evaluation_dir` for the directory of the evaluation data

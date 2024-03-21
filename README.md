@@ -12,7 +12,7 @@ Student Info
 
 * Name: *Nguyen Phan Gia Bao*
 * ID: *BI12-048*
-* Group ID: *TBA*
+* Group ID: *1*
 
 # Usage
 
